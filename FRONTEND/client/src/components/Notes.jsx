@@ -22,7 +22,7 @@ function Notes() {
     async function getNotes() {
         const token = localStorage.getItem("token");
         try {
-            const res = await axios.get("http://localhost:8000/notes",
+            const res = await axios.get("https://notevault-backend-xykr.onrender.com/notes",
                 {
                     headers: {
                         Authorization: `Bearer ${token}`
@@ -39,7 +39,7 @@ function Notes() {
         e.preventDefault();
         const token = localStorage.getItem("token");
         try {
-            let res = await axios.post("http://localhost:8000/notes",
+            let res = await axios.post("https://notevault-backend-xykr.onrender.com/notes",
                 {
                     title,
                     content
@@ -60,7 +60,7 @@ function Notes() {
     async function deleteNote(id) {
         const token = localStorage.getItem("token");
         try {
-            await axios.delete(`http://localhost:8000/notes/${id}`, {
+            await axios.delete(`https://notevault-backend-xykr.onrender.com/notes/${id}`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
