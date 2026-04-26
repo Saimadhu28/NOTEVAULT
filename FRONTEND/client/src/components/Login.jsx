@@ -12,7 +12,7 @@ function Login() {
   async function handleLogin(e) {
     e.preventDefault();
     try {
-      let res = await axios.post("http://localhost:8000/login", {
+      let res = await axios.post("https://notevault-backend-xykr.onrender.com", {
         email: email,
         password: password
       });
