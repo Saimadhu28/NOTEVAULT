@@ -75,7 +75,7 @@ function Notes() {
         const token = localStorage.getItem("token");
 
         await axios.put(
-            `http://localhost:8000/notes/${id}`,
+            `https://notevault-backend-xykr.onrender.com/notes/${id}`,
             { title: newTitle, content: newContent },
             {
                 headers: {
