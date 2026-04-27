@@ -2,6 +2,7 @@ import React from 'react'
 import { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -9,10 +10,21 @@ function Login() {
   const [msg, setMessage] = useState("");
   const navigate = useNavigate();
 
+
+   useEffect(() => {
+      const token = localStorage.getItem("token");
+      if (token) {
+        navigate("/notes");
+      }
+    }, []);
+
   async function handleLogin(e) {
     e.preventDefault();
+
+   
+
     try {
-      let res = await axios.post("https://notevault-backend-xykr.onrender.com/login", {
+      let res = await axios.post("http://localhost:8000/login", {
         email: email,
         password: password
       });
