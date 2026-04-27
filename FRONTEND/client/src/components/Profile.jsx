@@ -18,7 +18,7 @@ function Profile() {
     async function fetchProfile() {
         const token = localStorage.getItem("token");
         try {
-            let res = await axios.get("https://notevault-backend-xykr.onrender.com/profile", {
+            let res = await axios.get("http://localhost:8000/profile", {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -31,7 +31,7 @@ function Profile() {
 
     async function updateProfile(newName) {
         const token = localStorage.getItem("token");
-        await axios.put("https://notevault-backend-xykr.onrender.com/profile/update-name",
+        await axios.put("http://localhost:8000/profile/update-name",
             { name: newName },
             {
                 headers: {
