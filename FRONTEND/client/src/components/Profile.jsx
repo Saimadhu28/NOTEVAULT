@@ -1,71 +1,111 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
-import { useNavigate } from 'react-router-dom';
 
-function Register() {
-    const [name, setName] = useState("");
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [msg, setMessage] = useState("");
+function Profile() {
     const navigate = useNavigate();
+    const [user, setUser] = useState("");
 
-    async function register(e) {
-        e.preventDefault();
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        if (!token) {
+            navigate("/login");
+        } else {
+            fetchProfile();
+        }
+    }, []);
+
+    async function fetchProfile() {
+        const token = localStorage.getItem("token");
         try {
-            let res = await axios.post("http://localhost:8000/register", {
-                name: name,
-                email: email,
-                password: password
+            let res = await axios.get("http://localhost:8000/profile", {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
             });
-            setMessage(res.data.message);
+            setUser(res.data);
         } catch (err) {
-            setMessage("Error Occured");
+            navigate("/login");
         }
     }
 
+    async function updateProfile(newName) {
+        const token = localStorage.getItem("token");
+        await axios.put("http://localhost:8000/profile/update-name",
+            { name: newName },
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+        );
+        fetchProfile();
+    }
+
+    const initials = user.name
+        ? user.name.split(" ").map(w => w[0]).slice(0, 2).join("").toUpperCase()
+        : "?";
+
     return (
         <div className="center">
-            <form onSubmit={register} className="box">
 
-                <div style={{ textAlign: "center", marginBottom: "4px" }}>
-                    <div style={{
-                        width: 48, height: 48,
-                        background: "linear-gradient(135deg,#3b5bdb,#4c6ef5)",
-                        borderRadius: 14,
-                        display: "inline-flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        marginBottom: 12,
-                        boxShadow: "0 4px 16px rgba(59,91,219,0.3)"
-                    }}>
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                        </svg>
-                    </div>
-                    <p style={{ fontSize: 12, color: "var(--ink-faint)", letterSpacing: "0.08em", textTransform: "uppercase" }}>NoteVault</p>
-                </div>
+            <div className="profile-card">
 
-                <h2>Create account</h2>
-                <p style={{ textAlign:"center", color:"var(--ink-muted)", fontSize:14, marginTop:-6, marginBottom:4 }}>
-                    Start capturing your ideas
-                </p>
+                <div className="avatar">{initials}</div>
 
-                <input type="text" placeholder='Full name' onChange={(e) => setName(e.target.value)} />
-                <input type="email" placeholder='Email address' onChange={(e) => setEmail(e.target.value)} />
-                <input type="password" placeholder='Create password' onChange={(e) => setPassword(e.target.value)} />
+                <h2>My Profile</h2>
 
-                <button style={{ marginTop: 4 }}>Create account</button>
+                <hr className="divider" />
 
-                <button type="button" className="btn-secondary" onClick={() => navigate("/login")}>
-                    Back to sign in
+                <p><strong>Username</strong> {user.name}</p>
+
+                <p><strong>Email</strong> {user.email}</p>
+
+                <hr className="divider" />
+
+                <button onClick={() => {
+                    const newname = prompt("Enter new name", user.name)
+                    if (!newname) return
+                    updateProfile(newname)
+                }} style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8 }}>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                    </svg>
+                    Update name
                 </button>
 
-                <h4>{msg}</h4>
+                <button className="btn-secondary" onClick={() => navigate("/notes")}
+                    style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8 }}
+                >
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+                    </svg>
+                    Back to notes
+                </button>
 
-            </form>
+                <button
+                    className="btn-secondary"
+                    onClick={() => {
+                        localStorage.removeItem("token")
+                        navigate("/login")
+                    }}
+                    style={{
+                        display:"flex", alignItems:"center", justifyContent:"center", gap:8,
+                        color:"#e03131", borderColor:"rgba(224,49,49,0.2)"
+                    }}
+                >
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                        <polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+                    </svg>
+                    Logout
+                </button>
+
+            </div>
+
         </div>
     )
 }
 
-export default Register
+export default Profile
